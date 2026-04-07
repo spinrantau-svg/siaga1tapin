@@ -1,9 +1,9 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tapin Siaga 1</title>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Tapin Siaga 1 - Satpol PP & Damkar</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
@@ -12,14 +12,17 @@
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap');
-        body { font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; background-color: #f8fafc; margin: 0; }
-        .animate-in { animation: fadeIn 0.4s ease-out; }
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap');
+        body { 
+            font-family: 'Plus Jakarta Sans', sans-serif; 
+            -webkit-tap-highlight-color: transparent;
+        }
+        .animate-in { animation: fadeIn 0.5s ease-out; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         .hide-scrollbar::-webkit-scrollbar { display: none; }
     </style>
 </head>
-<body>
+<body class="bg-white text-slate-900 selection:bg-red-600 selection:text-white">
     <div id="root"></div>
 
     <script type="text/babel">
@@ -29,6 +32,7 @@
         const App = () => {
             const [selectedService, setSelectedService] = useState(null);
             const [isModalOpen, setIsModalOpen] = useState(false);
+            const [scrolled, setScrolled] = useState(false);
             const [activeTab, setActiveTab] = useState('home');
             const [agreedToTerms, setAgreedToTerms] = useState(false);
             const [formData, setFormData] = useState({
@@ -36,13 +40,31 @@
             });
 
             useEffect(() => {
+                const handleScroll = () => setScrolled(window.scrollY > 20);
+                window.addEventListener('scroll', handleScroll);
                 if (window.lucide) window.lucide.createIcons();
-            }, [activeTab, isModalOpen, selectedService]);
+                return () => window.removeEventListener('scroll', handleScroll);
+            }, [activeTab, isModalOpen]);
 
             const services = [
-                { id: 'KEBAKARAN', tag: 'UNIT DAMKAR', phone: "62811516113", color: "from-red-600 to-red-700", bg: "bg-red-50", icon: "flame" },
-                { id: 'TRANTIBUM', tag: 'SATPOL PP', phone: "62811518511", color: "from-blue-600 to-blue-800", bg: "bg-blue-50", icon: "shield" },
-                { id: 'RESCUE', tag: 'EVAKUASI', phone: "62811516113", color: "from-amber-500 to-orange-600", bg: "bg-amber-50", icon: "life-buoy" }
+                {
+                    id: 'kebakaran', title: 'KEBAKARAN', tagline: 'UNIT DAMKAR',
+                    description: 'Penanganan pemadaman api pada bangunan, lahan, atau kendaraan.',
+                    icon: 'flame', color: 'from-red-600 to-red-700', shadow: 'shadow-red-500/20',
+                    accent: 'bg-red-50', border: 'border-red-100', btnColor: 'bg-red-600', phone: "62811516113"
+                },
+                {
+                    id: 'trantibum', title: 'TRANTIBUM', tagline: 'SATPOL PP',
+                    description: 'Laporan gangguan ketertiban umum, pelanggaran Perda, asusila, dan miras.',
+                    icon: 'shield', color: 'from-blue-600 to-blue-800', shadow: 'shadow-blue-500/20',
+                    accent: 'bg-blue-50', border: 'border-blue-100', btnColor: 'bg-blue-700', phone: "62811518511"
+                },
+                {
+                    id: 'rescue', title: 'RESCUE', tagline: 'EVAKUASI',
+                    description: 'Bantuan evakuasi ular/tawon, pohon tumbang, hingga kecelakaan.',
+                    icon: 'life-buoy', color: 'from-amber-500 to-orange-600', shadow: 'shadow-amber-500/20',
+                    accent: 'bg-amber-50', border: 'border-amber-100', btnColor: 'bg-amber-600', phone: "62811516113"
+                }
             ];
 
             const handleSendWhatsApp = (e) => {
@@ -50,157 +72,155 @@
                 if (!agreedToTerms) return;
 
                 let message = "";
-                if (selectedService.id === 'KEBAKARAN') {
+                if (selectedService.id === 'kebakaran') {
                     message = `🚨 *EMERGENCY: LAPORAN KEBAKARAN*%0A%0A*Nama:* ${formData.nama}%0A*Lokasi:* ${formData.lokasi}%0A*Kondisi:* ${formData.kondisi}%0A*Patokan:* ${formData.patokan}%0A%0AMohon bantuan segera!`;
                 } else {
-                    message = `🚨 *LAPORAN ${selectedService.id}*%0A%0A*Nama:* ${formData.nama}%0A*Lokasi:* ${formData.lokasi}%0A*Detail:* ${formData.detail}%0A%0A_Melalui Aplikasi Tapin Siaga 1_`;
+                    message = `🚨 *LAPORAN ${selectedService.id.toUpperCase()}*%0A%0A*Nama:* ${formData.nama}%0A*Lokasi:* ${formData.lokasi}%0A*Detail:* ${formData.detail}`;
                 }
 
-                const waUrl = `https://wa.me/${selectedService.phone}?text=${message}`;
-                
-                // Solusi agar tidak ditolak koneksinya: Buka di tab baru
-                window.open(waUrl, '_blank');
+                window.open(`https://wa.me/${selectedService.phone}?text=${message}`, '_blank');
                 setIsModalOpen(false);
             };
 
             return (
-                <div className="min-h-screen pb-32">
+                <div className="min-h-screen pb-24">
                     {/* Header */}
-                    <header className="bg-white/80 backdrop-blur-md sticky top-0 z-50 p-4 border-b border-slate-100 flex items-center justify-between">
-                        <div className="flex items-center gap-3">
-                            <div className="w-9 h-9 bg-black rounded-lg flex items-center justify-center text-white font-black italic shadow-lg text-lg">T</div>
-                            <div>
-                                <h1 className="text-[10px] font-black uppercase leading-none text-slate-900">Satpol PP & Damkar</h1>
-                                <p className="text-[9px] font-bold text-red-600 uppercase">Kabupaten Tapin</p>
+                    <header className={`fixed top-0 w-full z-50 transition-all ${scrolled || activeTab !== 'home' ? 'bg-white/90 backdrop-blur-md py-3 shadow-sm' : 'bg-transparent py-5'}`}>
+                        <div className="max-w-7xl mx-auto px-5 flex items-center justify-between">
+                            <div className="flex items-center gap-3">
+                                <div className="w-9 h-9 bg-black rounded-lg flex items-center justify-center text-white font-black italic shadow-lg">T</div>
+                                <div className={scrolled || activeTab !== 'home' ? 'opacity-100' : 'opacity-0'}>
+                                    <h1 className="text-[10px] font-black uppercase leading-none">Satpol PP & Damkar</h1>
+                                    <p className="text-[9px] font-bold text-red-600 uppercase">Kabupaten Tapin</p>
+                                </div>
                             </div>
                         </div>
                     </header>
 
-                    {/* TAB HOME */}
-                    {activeTab === 'home' && (
-                        <main className="p-6 animate-in max-w-xl mx-auto">
-                            <div className="mb-8">
-                                <span className="inline-flex items-center gap-2 px-3 py-1 bg-black text-white text-[9px] font-black uppercase rounded-full mb-3">
-                                    <span className="w-1.5 h-1.5 bg-red-500 rounded-full animate-pulse"></span> Emergency 24/7
-                                </span>
-                                <h2 className="text-5xl font-black tracking-tighter leading-none uppercase italic text-slate-900">TAPIN <br/><span className="text-red-600">SIAGA 1.</span></h2>
-                            </div>
-
-                            <div className="space-y-4">
-                                {services.map(s => (
-                                    <div key={s.id} className={`${s.bg} rounded-[30px] p-6 border border-slate-100 shadow-sm`}>
-                                        <div className="flex gap-4 mb-4">
-                                            <div className={`w-12 h-12 bg-gradient-to-br ${s.color} rounded-xl flex items-center justify-center text-white shadow-lg`}>
-                                                <i data-lucide={s.icon} className="w-6 h-6"></i>
+                    {activeTab === 'home' ? (
+                        <main className="animate-in">
+                            <section className="pt-32 pb-12 px-5 max-w-xl mx-auto">
+                                <div className="inline-flex items-center gap-2 px-3 py-1 bg-slate-900 rounded-full mb-6">
+                                    <div className="w-2 h-2 bg-red-500 rounded-full animate-pulse"></div>
+                                    <span className="text-[8px] font-black text-white tracking-[0.2em] uppercase">Emergency Response 24/7</span>
+                                </div>
+                                <h2 className="text-6xl font-black text-slate-950 leading-[0.9] tracking-tighter uppercase mb-6">
+                                    TAPIN <br/> <span className="text-red-600 italic">SIAGA 1.</span>
+                                </h2>
+                                <div className="space-y-6 mt-12">
+                                    {services.map(s => (
+                                        <div key={s.id} className={`${s.accent} rounded-[32px] p-6 border-2 ${s.border}`}>
+                                            <div className="flex items-start gap-4 mb-6">
+                                                <div className={`w-14 h-14 bg-gradient-to-br ${s.color} rounded-2xl flex items-center justify-center text-white shadow-xl`}>
+                                                    <i data-lucide={s.icon}></i>
+                                                </div>
+                                                <div>
+                                                    <p className="text-[10px] font-black text-slate-400 uppercase mb-1">{s.tagline}</p>
+                                                    <h4 className="text-xl font-black uppercase leading-none mb-2">{s.title}</h4>
+                                                    <p className="text-xs text-slate-600 italic">{s.description}</p>
+                                                </div>
                                             </div>
-                                            <div>
-                                                <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest leading-none mb-1">{s.tag}</p>
-                                                <h4 className="text-lg font-black uppercase text-slate-900 leading-none">{s.id}</h4>
-                                            </div>
+                                            <button onClick={() => { setSelectedService(s); setIsModalOpen(true); }} className={`w-full py-4 ${s.btnColor} text-white font-black text-xs rounded-2xl uppercase tracking-widest shadow-lg`}>
+                                                Laporkan Sekarang
+                                            </button>
                                         </div>
-                                        <button onClick={() => { setSelectedService(s); setIsModalOpen(true); }} className={`w-full py-4 rounded-2xl bg-slate-900 text-white font-black text-xs uppercase tracking-widest shadow-xl active:scale-95 transition-transform`}>
-                                            Laporkan
-                                        </button>
-                                    </div>
-                                ))}
+                                    ))}
+                                </div>
+                            </section>
+                        </main>
+                    ) : null}
+
+                    {activeTab === 'panduan' ? (
+                        <main className="pt-32 px-6 max-w-xl mx-auto animate-in">
+                            <h2 className="text-3xl font-black uppercase italic mb-8">Panduan & Ketentuan</h2>
+                            <div className="space-y-6">
+                                <div className="bg-red-50 p-6 rounded-3xl border border-red-100">
+                                    <h4 className="font-black text-red-600 mb-4 uppercase text-sm">🚨 Prosedur Darurat</h4>
+                                    <ul className="space-y-4 text-xs font-bold">
+                                        <li>1. TETAP TENANG & JANGAN PANIK</li>
+                                        <li>2. UTAMAKAN KESELAMATAN DIRI</li>
+                                        <li>3. BERIKAN PATOKAN LOKASI JELAS</li>
+                                    </ul>
+                                </div>
+                                <div className="p-6 bg-slate-50 rounded-3xl border border-slate-200">
+                                    <h4 className="font-black mb-2 uppercase text-xs">⚖️ Sanksi Laporan Palsu</h4>
+                                    <p className="text-[11px] leading-relaxed italic text-slate-500">Berdasarkan UU ITE, segala bentuk laporan palsu/prank yang merugikan pengerahan armada dapat diproses secara pidana.</p>
+                                </div>
                             </div>
                         </main>
-                    )}
+                    ) : null}
 
-                    {/* TAB PANDUAN */}
-                    {activeTab === 'panduan' && (
-                        <main className="p-6 animate-in max-w-xl mx-auto">
-                            <div className="mb-8 text-center uppercase italic">
-                                <h2 className="text-3xl font-black tracking-tighter text-slate-900">Panduan & Ketentuan</h2>
-                                <p className="text-slate-500 text-[10px] font-black tracking-widest mt-1">Edukasi Layanan Pengaduan</p>
-                            </div>
-
-                            <div className="space-y-8 text-slate-900">
-                                <section className="bg-white p-6 rounded-[30px] border border-slate-100 shadow-sm">
-                                    <h4 className="font-black mb-6 flex items-center gap-2">🚨 Prosedur Darurat</h4>
-                                    <div className="space-y-4">
-                                        <div className="flex gap-4">
-                                            <b className="text-red-600 italic">1.</b>
-                                            <p className="text-xs"><b>Tetap Tenang:</b> Jangan panik agar informasi lokasi bisa tersampaikan dengan jelas kepada petugas.</p>
-                                        </div>
-                                        <div className="flex gap-4">
-                                            <b className="text-red-600 italic">2.</b>
-                                            <p className="text-xs"><b>Utamakan Keselamatan:</b> Evakuasi diri dan orang sekitar terlebih dahulu, jangan ambil risiko berbahaya.</p>
-                                        </div>
-                                        <div className="flex gap-4">
-                                            <b className="text-red-600 italic">3.</b>
-                                            <p className="text-xs"><b>Amati Lokasi:</b> Berikan patokan terdekat (masjid, sekolah, dsb) untuk percepatan tim di lapangan.</p>
-                                        </div>
-                                    </div>
-                                </section>
-
-                                <section className="px-2 space-y-6">
-                                    <h4 className="font-black flex items-center gap-2 uppercase text-sm">⚖️ Ketentuan Pelaporan</h4>
-                                    <div className="flex gap-4 italic border-l-4 border-red-600 pl-4 py-2">
-                                        <p className="text-xs font-bold text-slate-600 tracking-tight">Laporan palsu atau prank yang mengakibatkan pengerahan armada dapat ditindak secara hukum (UU ITE).</p>
-                                    </div>
-                                    <div className="grid grid-cols-2 gap-4">
-                                        <div className="p-4 bg-green-50 rounded-2xl border border-green-100">
-                                            <b className="text-[10px] block mb-1 uppercase font-black text-green-700">Keaslian Data</b>
-                                            <p className="text-[9px] font-medium text-slate-600">Pelapor wajib menggunakan nama asli dan lokasi akurat.</p>
-                                        </div>
-                                        <div className="p-4 bg-blue-50 rounded-2xl border border-blue-100">
-                                            <b className="text-[10px] block mb-1 uppercase font-black text-blue-700">Privasi</b>
-                                            <p className="text-[9px] font-medium text-slate-600">Identitas pelapor gangguan Trantibum dijaga ketat kerahasiaannya.</p>
-                                        </div>
-                                    </div>
-                                </section>
+                    {activeTab === 'hotline' ? (
+                        <main className="pt-32 px-6 max-w-xl mx-auto animate-in text-center">
+                            <h2 className="text-3xl font-black uppercase italic mb-8">Hotline Bantuan</h2>
+                            <div className="space-y-4 text-left">
+                                <a href="tel:0811516113" className="block p-6 bg-red-50 rounded-3xl border border-red-100">
+                                    <p className="text-[10px] font-black text-red-600 uppercase mb-1">Damkar & Rescue</p>
+                                    <p className="text-2xl font-black">0811-5161-13</p>
+                                </a>
+                                <a href="tel:0811518511" className="block p-6 bg-blue-50 rounded-3xl border border-blue-100">
+                                    <p className="text-[10px] font-black text-blue-600 uppercase mb-1">Satpol PP (Trantibum)</p>
+                                    <p className="text-2xl font-black">0811-5185-11</p>
+                                </a>
                             </div>
                         </main>
-                    )}
+                    ) : null}
 
                     {/* Navigasi Bawah */}
-                    <nav className="fixed bottom-6 left-6 right-6 h-16 bg-white border border-slate-100 shadow-2xl rounded-full flex items-center justify-around z-50 max-w-sm mx-auto">
-                        <button onClick={() => setActiveTab('home')} className={activeTab === 'home' ? 'text-red-600 scale-110 transition-all' : 'text-slate-300'}>
-                            <i data-lucide="home"></i>
+                    <nav className="fixed bottom-6 left-5 right-5 h-16 bg-white/90 backdrop-blur-xl rounded-2xl border border-slate-200 shadow-2xl flex items-center justify-around z-50 max-w-sm mx-auto px-4">
+                        <button onClick={() => setActiveTab('home')} className={`flex flex-col items-center gap-1 ${activeTab === 'home' ? 'text-red-600' : 'text-slate-400'}`}>
+                            <i data-lucide="home" class="w-5 h-5"></i>
+                            <span className="text-[8px] font-black uppercase">Beranda</span>
                         </button>
-                        <button onClick={() => setActiveTab('panduan')} className={activeTab === 'panduan' ? 'text-red-600 scale-110 transition-all' : 'text-slate-300'}>
-                            <i data-lucide="book-open"></i>
+                        <button onClick={() => setActiveTab('panduan')} className={`flex flex-col items-center gap-1 ${activeTab === 'panduan' ? 'text-red-600' : 'text-slate-400'}`}>
+                            <i data-lucide="book-open" class="w-5 h-5"></i>
+                            <span className="text-[8px] font-black uppercase">Panduan</span>
+                        </button>
+                        <button onClick={() => { setSelectedService(services[0]); setIsModalOpen(true); }} className="relative -top-8 w-16 h-16 bg-red-600 rounded-full flex items-center justify-center text-white shadow-xl shadow-red-200">
+                            <i data-lucide="alert-triangle" class="w-8 h-8"></i>
+                        </button>
+                        <button onClick={() => setActiveTab('hotline')} className={`flex flex-col items-center gap-1 ${activeTab === 'hotline' ? 'text-red-600' : 'text-slate-400'}`}>
+                            <i data-lucide="phone" class="w-5 h-5"></i>
+                            <span className="text-[8px] font-black uppercase">Hotline</span>
                         </button>
                     </nav>
 
                     {/* Modal Form */}
-                    {isModalOpen && selectedService && (
+                    {isModalOpen && selectedService ? (
                         <div className="fixed inset-0 z-[100] flex items-end">
-                            <div className="absolute inset-0 bg-black/60 backdrop-blur-sm animate-in" onClick={() => setIsModalOpen(false)}></div>
-                            <form onSubmit={handleSendWhatsApp} className="relative bg-white w-full rounded-t-[40px] p-8 pb-10 animate-in slide-in-from-bottom overflow-hidden shadow-2xl">
+                            <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setIsModalOpen(false)}></div>
+                            <form onSubmit={handleSendWhatsApp} className="relative bg-white w-full rounded-t-[40px] p-8 max-h-[90vh] overflow-y-auto animate-in">
                                 <div className="w-12 h-1.5 bg-slate-200 rounded-full mx-auto mb-6"></div>
-                                <h3 className="font-black italic uppercase text-xl mb-6">Laporan {selectedService.id}</h3>
-                                
-                                <div className="space-y-4">
-                                    <input required placeholder="Nama Lengkap Pelapor" className="w-full p-4 bg-slate-50 border-2 border-transparent focus:border-red-600 outline-none rounded-2xl font-bold text-sm" onChange={e => setFormData({...formData, nama: e.target.value})} />
+                                <h3 className="text-2xl font-black uppercase italic mb-6">Laporan {selectedService.id}</h3>
+                                <div className="space-y-4 pb-12">
+                                    <input required placeholder="Nama Lengkap" className="w-full p-4 bg-slate-50 border-2 border-transparent focus:border-red-600 outline-none rounded-2xl font-bold text-sm" onChange={e => setFormData({...formData, nama: e.target.value})} />
                                     <textarea required placeholder="Alamat / Lokasi Kejadian" className="w-full p-4 bg-slate-50 border-2 border-transparent focus:border-red-600 outline-none rounded-2xl font-bold text-sm h-24" onChange={e => setFormData({...formData, lokasi: e.target.value})} />
                                     
-                                    {selectedService.id === 'KEBAKARAN' ? (
-                                        <div className="grid grid-cols-2 gap-4 text-sm font-bold">
-                                            <select className="p-4 bg-slate-50 rounded-2xl outline-none" onChange={e => setFormData({...formData, kondisi: e.target.value})}>
+                                    {selectedService.id === 'kebakaran' ? (
+                                        <div className="grid grid-cols-2 gap-4">
+                                            <select className="p-4 bg-slate-50 rounded-2xl font-bold text-sm border-2 border-transparent" onChange={e => setFormData({...formData, kondisi: e.target.value})}>
                                                 <option>Api Besar</option>
                                                 <option>Api Kecil</option>
                                                 <option>Asap Saja</option>
                                             </select>
-                                            <input placeholder="Patokan" className="p-4 bg-slate-50 rounded-2xl outline-none" onChange={e => setFormData({...formData, patokan: e.target.value})} />
+                                            <input placeholder="Patokan" className="p-4 bg-slate-50 rounded-2xl font-bold text-sm border-2 border-transparent" onChange={e => setFormData({...formData, patokan: e.target.value})} />
                                         </div>
                                     ) : (
-                                        <textarea placeholder="Detail laporan..." className="w-full p-4 bg-slate-50 border-2 border-transparent focus:border-red-600 outline-none rounded-2xl font-bold text-sm h-24" onChange={e => setFormData({...formData, detail: e.target.value})} />
+                                        <textarea required placeholder="Detail Laporan..." className="w-full p-4 bg-slate-50 border-2 border-transparent focus:border-red-600 outline-none rounded-2xl font-bold text-sm h-24" onChange={e => setFormData({...formData, detail: e.target.value})} />
                                     )}
 
                                     <div className="flex gap-3 items-start p-4 bg-red-50 rounded-2xl border border-red-100">
                                         <input type="checkbox" required onChange={e => setAgreedToTerms(e.target.checked)} className="mt-1 w-5 h-5 accent-red-600" />
-                                        <label className="text-[10px] font-bold text-slate-600">Saya menyatakan laporan ini benar dan siap bertanggung jawab secara hukum atas kebenaran informasi ini.</label>
+                                        <label className="text-[10px] font-bold text-slate-600 uppercase leading-tight italic">Saya menyatakan laporan ini benar dan siap diproses hukum jika palsu.</label>
                                     </div>
 
-                                    <button type="submit" disabled={!agreedToTerms} className={`w-full py-5 rounded-2xl text-white font-black uppercase italic shadow-xl transition-all ${agreedToTerms ? 'bg-green-600' : 'bg-slate-300'}`}>
+                                    <button type="submit" disabled={!agreedToTerms} className={`w-full py-5 rounded-2xl text-white font-black uppercase italic shadow-xl ${agreedToTerms ? 'bg-green-600' : 'bg-slate-300'}`}>
                                         Kirim via WhatsApp
                                     </button>
                                 </div>
                             </form>
                         </div>
-                    )}
+                    ) : null}
                 </div>
             );
         };
